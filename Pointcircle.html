@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Окружность по трем точкам</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Окружность по трем точкам</h1>
+        
+        <div class="card">
+            <div class="input-row">
+                <label>Точка 1</label>
+                <input type="number" id="x1" placeholder="x1">
+                <input type="number" id="y1" placeholder="y1">
+            </div>
+            <div class="input-row">
+                <label>Точка 2</label>
+                <input type="number" id="x2" placeholder="x2">
+                <input type="number" id="y2" placeholder="y2">
+            </div>
+            <div class="input-row">
+                <label>Точка 3</label>
+                <input type="number" id="x3" placeholder="x3">
+                <input type="number" id="y3" placeholder="y3">
+            </div>
+            <button onclick="calculateCircle()">Рассчитать</button>
+        </div>
+
+        <div class="card">
+            <div class="result">
+                <p id="center">Центр: —</p>
+                <p id="radius">Радиус: —</p>
+                <div class="color-hint">
+                    <div><span class="color-dot" style="background: #e74c3c"></span>Точка 1</div>
+                    <div><span class="color-dot" style="background: #2ecc71"></span>Точка 2</div>
+                    <div><span class="color-dot" style="background: #3498db"></span>Точка 3</div>
+                    <div><span class="color-dot" style="background: #9b59b6"></span>Центр</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="canvas-container">
+                <canvas id="canvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Смещение для центра canvas
+    const offsetX = canvas.width / 2;
+    const offsetY = canvas.height / 2;
+
+    // Функция для рисования осей
+    function drawAxes() {
+        // Ось X
+        ctx.beginPath();
+        ctx.moveTo(0, offsetY);
+        ctx.lineTo(canvas.width, offsetY);
+        ctx.strokeStyle = '#ddd';
+        ctx.stroke();
+
+        // Ось Y
+        ctx.beginPath();
+        ctx.moveTo(offsetX, 0);
+        ctx.lineTo(offsetX, canvas.height);
+        ctx.strokeStyle = '#ddd';
+        ctx.stroke();
+
+        // Подписи осей
+        ctx.fillStyle = '#ddd';
+        ctx.font = '12px Arial';
+        ctx.fillText('X', canvas.width - 10, offsetY - 10);
+        ctx.fillText('Y', offsetX + 10, 10);
+    }
+
+    // Функция для рисования точки
+    function drawPoint(x, y, color = 'red') {
+        ctx.beginPath();
+        ctx.arc(x + offsetX, offsetY - y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    // Функция для рисования окружности
+    function drawCircle(centerX, centerY, radius) {
+        ctx.beginPath();
+        ctx.arc(centerX + offsetX, offsetY - centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#4A89DC';
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    // Функция для очистки canvas
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawAxes();
+    }
+
+    // Функция для расчёта окружности
+    function calculateCircle() {
+        const x1 = parseFloat(document.getElementById('x1').value);
+        const y1 = parseFloat(document.getElementById('y1').value);
+        const x2 = parseFloat(document.getElementById('x2').value);
+        const y2 = parseFloat(document.getElementById('y2').value);
+        const x3 = parseFloat(document.getElementById('x3').value);
+        const y3 = parseFloat(document.getElementById('y3').value);
+
+        const A = x2 - x1;
+        const B = y2 - y1;
+        const C = x3 - x1;
+        const D = y3 - y1;
+
+        const E = A * (x1 + x2) + B * (y1 + y2);
+        const F = C * (x1 + x3) + D * (y1 + y3);
+        const G = 2 * (A * (y3 - y1) - B * (x3 - x1));
+
+        if (G === 0) {
+            alert("Точки лежат на одной прямой, окружность не существует.");
+            return;
+        }
+
+        const centerX = (D * E - B * F) / G;
+        const centerY = (A * F - C * E) / G;
+        const radius = Math.sqrt(Math.pow(x1 - centerX, 2) + Math.pow(y1 - centerY, 2));
+
+        document.getElementById('center').innerText = `Центр окружности X,Y: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`;
+        document.getElementById('radius').innerText = `Радиус окружности: ${radius.toFixed(2)}`;
+
+        clearCanvas();
+        drawCircle(centerX, centerY, radius);
+        drawPoint(x1, y1, '#e74c3c');
+        drawPoint(x2, y2, '#2ecc71');
+        drawPoint(x3, y3, '#3498db');
+        drawPoint(centerX, centerY, '#9b59b6');
+    }
+
+    // Инициализация
+    drawAxes();
+    </script>
+</body>
+</html>
