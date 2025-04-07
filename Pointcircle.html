@@ -7,24 +7,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <div class="calculator-container">
         <h1>Окружность по трем точкам</h1>
         
         <div class="card">
             <div class="input-row">
                 <label>Точка 1</label>
-                <input type="number" id="x1" placeholder="x1">
-                <input type="number" id="y1" placeholder="y1">
+                <input type="number" id="x1" placeholder="Точка X1">
+                <input type="number" id="y1" placeholder="Точка Y1">
             </div>
             <div class="input-row">
                 <label>Точка 2</label>
-                <input type="number" id="x2" placeholder="x2">
-                <input type="number" id="y2" placeholder="y2">
+                <input type="number" id="x2" placeholder="Точка X2">
+                <input type="number" id="y2" placeholder="Точка Y2">
             </div>
             <div class="input-row">
                 <label>Точка 3</label>
-                <input type="number" id="x3" placeholder="x3">
-                <input type="number" id="y3" placeholder="y3">
+                <input type="number" id="x3" placeholder="Точка X3">
+                <input type="number" id="y3" placeholder="Точка Y3">
             </div>
             <button onclick="calculateCircle()">Рассчитать</button>
         </div>
@@ -33,12 +33,6 @@
             <div class="result">
                 <p id="center">Центр: —</p>
                 <p id="radius">Радиус: —</p>
-                <div class="color-hint">
-                    <div><span class="color-dot" style="background: #e74c3c"></span>Точка 1</div>
-                    <div><span class="color-dot" style="background: #2ecc71"></span>Точка 2</div>
-                    <div><span class="color-dot" style="background: #3498db"></span>Точка 3</div>
-                    <div><span class="color-dot" style="background: #9b59b6"></span>Центр</div>
-                </div>
             </div>
         </div>
 
@@ -57,33 +51,10 @@
     const offsetX = canvas.width / 2;
     const offsetY = canvas.height / 2;
 
-    // Функция для рисования осей
-    function drawAxes() {
-        // Ось X
-        ctx.beginPath();
-        ctx.moveTo(0, offsetY);
-        ctx.lineTo(canvas.width, offsetY);
-        ctx.strokeStyle = '#ddd';
-        ctx.stroke();
-
-        // Ось Y
-        ctx.beginPath();
-        ctx.moveTo(offsetX, 0);
-        ctx.lineTo(offsetX, canvas.height);
-        ctx.strokeStyle = '#ddd';
-        ctx.stroke();
-
-        // Подписи осей
-        ctx.fillStyle = '#ddd';
-        ctx.font = '12px Arial';
-        ctx.fillText('X', canvas.width - 10, offsetY - 10);
-        ctx.fillText('Y', offsetX + 10, 10);
-    }
-
-    // Функция для рисования точки
+    // Функция для рисования точки (обновленная для работы с трансформированными координатами)
     function drawPoint(x, y, color = 'red') {
         ctx.beginPath();
-        ctx.arc(x + offsetX, offsetY - y, 5, 0, Math.PI * 2);
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
@@ -101,7 +72,6 @@
     // Функция для очистки canvas
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawAxes();
     }
 
     // Функция для расчёта окружности
@@ -134,16 +104,49 @@
         document.getElementById('center').innerText = `Центр окружности X,Y: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`;
         document.getElementById('radius').innerText = `Радиус окружности: ${radius.toFixed(2)}`;
 
+        // Рассчет границ для центрирования
+        const allPoints = [
+            {x: x1, y: y1},
+            {x: x2, y: y2}, 
+            {x: x3, y: y3},
+            {x: centerX, y: centerY}
+        ];
+        
+        const padding = 20;
+        const minX = Math.min(...allPoints.map(p => p.x)) - radius - padding;
+        const maxX = Math.max(...allPoints.map(p => p.x)) + radius + padding;
+        const minY = Math.min(...allPoints.map(p => p.y)) - radius - padding;
+        const maxY = Math.max(...allPoints.map(p => p.y)) + radius + padding;
+        
+        const scaleX = canvas.width / (maxX - minX);
+        const scaleY = canvas.height / (maxY - minY);
+        const scale = Math.min(scaleX, scaleY) * 0.9; // 10% отступ
+        
+        // Функция преобразования координат
+        const transform = (x, y) => ({
+            x: (x - minX) * scale,
+            y: canvas.height - (y - minY) * scale // инвертируем Y
+        });
+
         clearCanvas();
-        drawCircle(centerX, centerY, radius);
-        drawPoint(x1, y1, '#e74c3c');
-        drawPoint(x2, y2, '#2ecc71');
-        drawPoint(x3, y3, '#3498db');
-        drawPoint(centerX, centerY, '#9b59b6');
+        
+        // Отрисовка окружности с центрированием
+        const tCenter = transform(centerX, centerY);
+        ctx.beginPath();
+        ctx.arc(tCenter.x, tCenter.y, radius * scale, 0, Math.PI * 2);
+        ctx.strokeStyle = '#4A89DC';
+        ctx.stroke();
+        ctx.closePath();
+
+        // Отрисовка точек
+        drawPoint(transform(x1, y1).x, transform(x1, y1).y, '#e74c3c');
+        drawPoint(transform(x2, y2).x, transform(x2, y2).y, '#2ecc71');
+        drawPoint(transform(x3, y3).x, transform(x3, y3).y, '#3498db');
+        drawPoint(tCenter.x, tCenter.y, '#9b59b6');
     }
 
     // Инициализация
-    drawAxes();
+    clearCanvas();
     </script>
 </body>
 </html>

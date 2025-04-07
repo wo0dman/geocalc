@@ -25,10 +25,31 @@ body {
   min-height: 100vh;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 10px;
+}
+
+.calculator-container {
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 450px) {
+  .calculator-container {
+    width: 100%;
+    padding: 10px;
+  }
 }
 
 .card {
@@ -42,9 +63,50 @@ body {
 h1, h2, h3 {
   color: white;
   margin-bottom: 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-input {
+h1 {
+  font-size: 1.0rem;
+}
+
+h2 {
+  font-size: 0.87rem;
+}
+
+h3 {
+  font-size: 0.73rem;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: var(--border-radius);
+  background-color: #2A2A2A;
+  color: var(--text);
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: block;
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  font-size: 18px;
+  line-height: 1.2;
+  padding-top: 2px;
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  input::placeholder {
+    font-size: 16px;
+  }
+}
+
+input[type="text"] {
   width: 100%;
   padding: 12px;
   border: 1px solid #333;
@@ -84,21 +146,42 @@ button:hover {
   text-align: center;
   font-size: 18px;
   padding: 12px;
-  color: var(--secondary);
+  color: #FFFFFF;
 }
 
 /* Мобильная адаптация */
 @media (max-width: 600px) {
-  body {
-    padding: 10px;
+  html {
+    font-size: 14px;
+  }
+
+  button, 
+  input[type="number"],
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .calculator-card {
+    padding: 15px;
+    margin-bottom: 10px;
+  }
+
+  .calculator-icon {
+    font-size: 30px;
+  }
+
+  .canvas-container {
+    height: 250px;
+  }
+
+  .calculator-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
   
-  .container {
-    padding: 10px;
-  }
-  
-  input, button {
-    padding: 10px;
+  .card {
+    padding: 15px;
   }
 }
 
